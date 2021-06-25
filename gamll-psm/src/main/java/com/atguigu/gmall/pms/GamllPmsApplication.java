@@ -10,7 +10,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableDiscoveryClient
 @EnableSwagger2
 @MapperScan("com.atguigu.gmall.pms.dao")
-public class GamllPmsApplication {
+public class  GamllPmsApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(GamllPmsApplication.class, args);

@@ -1,13 +1,13 @@
-package com.atguigu.gmallwms;
+package com.atguigu.gamll.gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class GmallWmsApplication {
+public class GamllGatewayApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(GmallWmsApplication.class, args);
+        SpringApplication.run(GamllGatewayApplication.class, args);
     }
 
 }

@@ -37,10 +37,10 @@ public class Resp<T> {
         return resp;
     }
 
-    public static<T> Resp<T> fail(String msg){
+    public static<T> Resp<T> fail(T data){
         Resp<T> resp = new Resp<T>();
         resp.setCode(1);//操作失败
-        resp.setMsg(msg);
+        resp.setMsg((String) data);
         return resp;
     }
 
