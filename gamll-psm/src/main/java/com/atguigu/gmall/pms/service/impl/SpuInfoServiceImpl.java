@@ -5,17 +5,20 @@ import com.atguigu.core.bean.Query;
 import com.atguigu.core.bean.QueryCondition;
 import com.atguigu.gmall.pms.dao.*;
 import com.atguigu.gmall.pms.entity.*;
+import com.atguigu.gmall.pms.feign.GmallSmsClient;
 import com.atguigu.gmall.pms.service.ProductAttrValueService;
 import com.atguigu.gmall.pms.service.SkuImagesService;
 import com.atguigu.gmall.pms.service.SkuSaleAttrValueService;
 import com.atguigu.gmall.pms.service.SpuInfoService;
 import com.atguigu.gmall.pms.vo.BaseAttrVo;
 import com.atguigu.gmall.pms.vo.SkuInfoVo;
+import com.atguigu.gmall.pms.vo.SkuSaleVo;
 import com.atguigu.gmall.pms.vo.SpuInfoVo;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -41,7 +44,11 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     @Autowired
     private SkuImagesService skuImagesService;
 
+    @Autowired
     private SkuSaleAttrValueService skuSaleAttrValueService;
+
+    @Autowired
+    private GmallSmsClient gmallSmsClient;
 
     @Override
     public PageVo queryPage(QueryCondition params) {
@@ -137,7 +144,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             }
 
             //2.3. 保存pms_sales_attr_value
-            List<SkuSaleAttrValueEntity> salesAttrs = skuInfoVo.getSalesAttrs();
+            List<SkuSaleAttrValueEntity> salesAttrs = skuInfoVo.getSaleAttrs();
             if (!CollectionUtils.isEmpty(salesAttrs)) {
                 //设置skuId
                 salesAttrs.forEach(skuSaleAttrValueEntity -> skuSaleAttrValueEntity.setSkuId(skuId));
@@ -145,15 +152,11 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                 this.skuSaleAttrValueService.saveBatch(salesAttrs);
             }
 
-
-            //3 保存营销信息的3张表
-            //3.1. 保存sms_sku_bounds
-
-            //3.2. 保存sms_sku_ladder
-
-            //3.2. 保存sms_sku_full_reduction
+            //3 保存营销信息的3张表(feign远程调用sms保存)
+            SkuSaleVo skuSaleVo =new SkuSaleVo();
+            BeanUtils.copyProperties(skuInfoVo,skuSaleVo);
+            skuSaleVo.setSkuId(skuId);
+            this.gmallSmsClient.saveSale(skuSaleVo);
         });
-
-
     }
 }
